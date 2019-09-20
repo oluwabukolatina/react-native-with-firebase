@@ -21,32 +21,47 @@ class Login extends Component {
       error: '',
       loading: true,
     });
+
     const {email, password} = this.state;
+    console.log(email, password);
+
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
+      .then(this.onLoginSuccess.bind(this))
       .catch(() => {
         firebase
           .auth()
           .createUserWithEmailAndPassword(email, password)
-          .catch(() => {
-            //show user the error
-            this.setState({
-              error: 'authentication failed',
-              loading: false,
-            });
-          });
+          .then(this.onLoginSuccess.bind(this))
+          .catch(this.onLoginFail.bind(this));
       });
   };
 
+  onLoginSuccess() {
+    this.setState({
+      email: '',
+      password: '',
+      loading: false,
+      error: '',
+    });
+  }
+
+  onLoginFail() {
+    this.setState({
+      error: 'authentication failed',
+      loading: false,
+    });
+  }
+
   displayButton() {
     const {loading} = this.state;
-    if  (loading) {
-      return <Spinner size={'small'} />;;
+    console.log(loading);
+    if (loading) {
+      return <Spinner size={'small'} />;
     }
 
     return <Button value={'login'} onPress={this.onButtonPress.bind(this)} />;
-   
   }
 
   render() {
